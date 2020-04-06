@@ -1,0 +1,31 @@
+{
+  "name": "nodepractice",
+  "version": "1.0.0",
+  "description": "learn node.js",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BaturayArslan/nodeTutorial.git"
+  },
+  "author": "baturay arslan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BaturayArslan/nodeTutorial/issues"
+  },
+  "homepage": "https://github.com/BaturayArslan/nodeTutorial#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "connect-session-sequelize": "^6.1.1",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "mysql2": "^2.1.0",
+    "pug": "^2.0.4",
+    "sequelize": "^5.21.3"
+  }
+}
