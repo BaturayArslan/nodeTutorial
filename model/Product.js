@@ -1,33 +1,111 @@
-const Sequelize = require("sequelize");
+const getDb = require("../util/database").getDb;
+const mongodb = require("mongodb");
 
-const sequelize = require("../util/database");
-
-const Product = sequelize.define("product", {
-  id: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  title: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  price: {
-    type: Sequelize.DOUBLE,
-    allowNull: false
-  },
-  imgUrl: {
-    type: Sequelize.STRING,
-    allowNull: false
-  },
-  description: {
-    type: Sequelize.STRING,
-    allowNull: false
+class Product {
+  constructor(title, price, description, imgUrl, id, userId) {
+    this.title = title;
+    this.price = price;
+    this.description = description;
+    this.imgUrl = imgUrl;
+    this._id = id ? new mongodb.ObjectId(id) : null;
+    this.userId = userId;
   }
-});
+  save() {
+    const db = getDb();
+    let dbOp;
+    if (this._id) {
+      //update
+      dbOp = db
+        .collection("products")
+        .updateOne({ _id: this._id }, { $set: this });
+    } else {
+      dbOp = db.collection("products").insertOne(this);
+    }
+    return dbOp
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  static fetchAll() {
+    const db = getDb();
+    return db
+      .collection("products")
+      .find()
+      .toArray()
+      .then((products) => {
+        return products;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  static findById(productId) {
+    const db = getDb();
+    return db
+      .collection("products")
+      .find({ _id: new mongodb.ObjectId(productId) })
+      .next()
+      .then((result) => {
+        return result;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  static delete(productId) {
+    const proId = new mongodb.ObjectId(productId);
+    const db = getDb();
+    return db
+      .collection("products")
+      .deleteOne({ _id: proId })
+      .then(() => {
+        console.log("Product Destroyed.");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+}
 
 module.exports = Product;
+
+// ---------------------------------------------------------------------------------
+// const Sequelize = require("sequelize");
+
+// const sequelize = require("../util/database");
+
+// const Product = sequelize.define("product", {
+//   id: {
+//     type: Sequelize.INTEGER,
+//     allowNull: false,
+//     primaryKey: true,
+//     autoIncrement: true
+//   },
+//   title: {
+//     type: Sequelize.STRING,
+//     allowNull: false
+//   },
+//   price: {
+//     type: Sequelize.DOUBLE,
+//     allowNull: false
+//   },
+//   imgUrl: {
+//     type: Sequelize.STRING,
+//     allowNull: false
+//   },
+//   description: {
+//     type: Sequelize.STRING,
+//     allowNull: false
+//   }
+// });
+// ---------------------------------------------------------------------
+// module.exports = Product;
 
 // const fs = require("fs");
 // const path = require("path");

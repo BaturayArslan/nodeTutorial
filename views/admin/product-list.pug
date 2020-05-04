@@ -16,11 +16,9 @@ block content
               )
             .card__content
               h2.product__price #{product.price}
-              p.product__description
-                A very interesting book about so many even more interesting
-                things
+              p.product__description #{product.description}
             div.card__actions
-              a.btn(href="/admin/edit-product/" + product.id + "?edit=true") Edit
-              button.btn Delete
+              a.btn(href="/admin/edit-product/" + product._id + "?edit=true") Edit
+              a.btn(href="/admin/delete-product/" + product._id) Delete
     else
       h1 there is no product

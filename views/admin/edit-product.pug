@@ -13,7 +13,7 @@ block content
         input(type="text", name="price", id="price" value = (editMode==="true" ? product.price:""))
         label(for="imgUrl") imgUrl
         input(type="text" name="imgUrl" max="20000" value = (editMode==="true" ? product.imgUrl:""))
-        input(type="hidden", name="productId", value=(editMode==="true" ? product.id:""))
+        input(type="hidden", name="productId", value=(editMode==="true" ? product._id:""))
         label(for="description") Description
         textarea(rows="5"  cols="50", name="description")  #{editMode === "true" ? product.description:""}
       button(type="submit") #{editMode==="true" ? "Edit Product":"Add Product"}
