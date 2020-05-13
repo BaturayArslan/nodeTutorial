@@ -5,21 +5,25 @@ exports.getLogin = (req, res, next) => {
   //   .get("Cookie")
   //   .split("=")[1]
   //   .trim();
-  console.log(req.session.isLogged);
+  const isLogged = req.session.isLogged;
   res.render("auth/login", {
     path: "/login",
     title: "Login",
-    isAuthenticated: req.session.isLogged
+    isAuthenticated: isLogged,
   });
 };
 
 exports.postLogin = (req, res, next) => {
-  User.findByPk(1)
-    .then(user => {
-      console.log(user);
-      req.session.user = user;
-      req.session.isLogged = true;
-      res.redirect("/?" + req.body.email);
-    })
-    .catch(err => console.log(err));
+  User.findById("5eb08c6f94c440a2b5007803").then((user) => {
+    req.session.user = user;
+    req.session.isLogged = true;
+    res.redirect("/");
+  });
+};
+
+exports.postLogout = (req, res, next) => {
+  req.session.destroy((err) => {
+    console.log(err);
+    res.redirect("/");
+  });
 };

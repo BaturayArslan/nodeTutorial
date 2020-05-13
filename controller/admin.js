@@ -2,9 +2,11 @@ const Product = require("../model/Product");
 // const User = require("../model/User");
 
 exports.getAddProduct = (req, res, next) => {
+  const isLogged = req.session.isLogged;
   res.render("admin/edit-product", {
     title: "Admin Panel",
     path: "/admin/add-product",
+    isAuthenticated: isLogged,
   });
 };
 
@@ -13,7 +15,7 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const imgUrl = req.body.imgUrl;
   const description = req.body.description;
-  const userId = req.user._id;
+  const userId = req.session.user._id;
 
   const product = new Product(title, price, description, imgUrl, null, userId);
   product
@@ -45,6 +47,7 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.getEditProduct = (req, res, next) => {
+  const isLogged = req.session.isLogged;
   let proId = req.params.productId;
   let editMode = req.query.edit;
   Product.findById(proId)
@@ -54,6 +57,7 @@ exports.getEditProduct = (req, res, next) => {
         title: "Edit Product",
         product: product,
         editMode: editMode,
+        isAuthenticated: isLogged,
       });
     })
     .catch((err) => {
@@ -79,12 +83,14 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProductList = (req, res, next) => {
+  const isLogged = req.session.isLogged;
   Product.fetchAll()
     .then((products) => {
       res.render("admin/product-list", {
         path: "/admin/product-list",
         title: "Admin Product List",
         prods: products,
+        isAuthenticated: isLogged,
       });
     })
     .catch((err) => {
