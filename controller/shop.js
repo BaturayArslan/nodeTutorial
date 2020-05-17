@@ -26,6 +26,7 @@ exports.getIndex = (req, res, next) => {
         title: "Products",
         path: "/",
         isAuthenticated: isLogged,
+        csrfToken: req.csrfToken(),
       });
     })
     .catch((err) => {
@@ -35,7 +36,7 @@ exports.getIndex = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   const isLogged = req.session.isLogged;
-  const prods = req.sessions.user.getCart();
+  const prods = req.user.getCart();
   Promise.all(prods).then((result) => {
     res.render("shop/cart", {
       title: "cart",
@@ -46,9 +47,9 @@ exports.getCart = (req, res, next) => {
   });
 
   // ---------------------------------------------
-  // console.log(req.session.user);
-  // req.session.user
-  //   .getCart({ where: { userId: req.session.user.id } })
+  // console.log(req.user.user);
+  // req.user.user
+  //   .getCart({ where: { userId: req.user.user.id } })
   //   .then((cart) => {
   //     return cart.getProducts();
   //   })
@@ -67,16 +68,21 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const id = req.body.productId;
-  const user = req.sessions.user;
+  const user = req.user;
   Product.findById(id).then((product) => {
-    user.addToCart(product).then(() => {
-      res.redirect("/");
-    });
+    user
+      .addToCart(product)
+      .then(() => {
+        res.redirect("/");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
 
   // --------------------------------------
   // let fetchCart;
-  // req.session.user
+  // req.user.user
   //   .getCart()
   //   .then((cart) => {
   //     fetchCart = cart;
@@ -95,7 +101,7 @@ exports.postCart = (req, res, next) => {
   //         through: { quantity: defaultQnt },
   //       });
   //     }
-  //     return req.session.user
+  //     return req.user.user
   //       .getProducts({ where: { id: id } })
   //       .then((product) => {
   //         return fetchCart.addProduct(product, {
@@ -114,13 +120,13 @@ exports.postCart = (req, res, next) => {
 
 exports.cartDeleteItem = (req, res, next) => {
   const productId = req.body.productId;
-  req.sessions.user.delCartItem(productId).then((result) => {
+  req.user.delCartItem(productId).then((result) => {
     res.redirect("/cart");
   });
 
   // ----------------------------------------
   // const productId = req.body.productId;
-  // req.session.user
+  // req.user.user
   //   .getCart()
   //   .then((cart) => {
   //     return cart.getProducts({ where: { id: productId } });
@@ -153,7 +159,7 @@ exports.getProductDetails = (req, res, next) => {
 };
 
 exports.postOrder = (req, res, next) => {
-  req.sessions.user.addOrder().then(() => {
+  req.user.addOrder().then(() => {
     res.redirect("/cart");
   });
 };

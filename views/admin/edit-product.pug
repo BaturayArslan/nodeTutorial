@@ -16,5 +16,6 @@ block content
         input(type="hidden", name="productId", value=(editMode==="true" ? product._id:""))
         label(for="description") Description
         textarea(rows="5"  cols="50", name="description")  #{editMode === "true" ? product.description:""}
+        input(type="hidden", name="_csrf", value = csrfToken)
       button(type="submit") #{editMode==="true" ? "Edit Product":"Add Product"}
     

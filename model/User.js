@@ -3,17 +3,17 @@ const getDb = require("../util/database").getDb;
 const mongodb = require("mongodb");
 
 class User {
-  constructor(name, email, cart, id) {
-    this.name = name;
+  constructor(email, password, cart, id) {
     this.email = email;
+    this.password = password;
     this.cart = cart; // cart {items: []}
     this._id = new mongodb.ObjectId(id);
   }
-  save() {
+  static save(user) {
     const db = getDb();
     return db
       .collection("users")
-      .insertOne(this)
+      .insertOne(user)
       .then(() => {
         console.log("Users inserted");
       })
@@ -84,7 +84,6 @@ class User {
           items: products,
           user: {
             _id: this._id,
-            name: this.name,
             email: this.email,
           },
         };
@@ -118,6 +117,20 @@ class User {
       .next()
       .then((result) => {
         return result;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  static findByEmail(email) {
+    const userEmail = email;
+    const db = getDb();
+    return db
+      .collection("users")
+      .findOne({ email: userEmail })
+      .then((user) => {
+        return user;
       })
       .catch((err) => {
         console.log(err);

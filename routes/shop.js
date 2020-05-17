@@ -3,6 +3,7 @@ const path = require("path");
 
 const shopController = require("../controller/shop");
 const erorController = require("../controller/eror");
+const routeProtection = require("../protectionMiddleW/routeProtection");
 
 const router = express.Router();
 
@@ -18,12 +19,16 @@ router.get("/product-details", shopController.getProductDetails);
 
 router.get("/product-details/:productId", shopController.getProductDetails);
 
-router.get("/cart", shopController.getCart);
+router.get("/cart", routeProtection, shopController.getCart);
 
-router.post("/cart", shopController.postCart);
+router.post("/cart", routeProtection, shopController.postCart);
 
-router.post("/cart-delete-item", shopController.cartDeleteItem);
+router.post(
+  "/cart-delete-item",
+  routeProtection,
+  shopController.cartDeleteItem
+);
 
-router.post("/createOrder", shopController.postOrder);
+router.post("/createOrder", routeProtection, shopController.postOrder);
 
 module.exports = router;
