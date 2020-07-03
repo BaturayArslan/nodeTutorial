@@ -11,15 +11,27 @@ class User {
   }
   static save(user) {
     const db = getDb();
-    return db
-      .collection("users")
-      .insertOne(user)
-      .then(() => {
-        console.log("Users inserted");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (user._id) {
+      return db
+        .collection("users")
+        .updateOne({ _id: user._id }, { $set: user })
+        .then(() => {
+          console.log("users updated");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      return db
+        .collection("users")
+        .insertOne(user)
+        .then(() => {
+          console.log("Users inserted");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   }
 
   addToCart(product) {
@@ -44,7 +56,7 @@ class User {
     return db
       .collection("users")
       .updateOne(
-        { _id: new mongodb.ObjectId("5eb08c6f94c440a2b5007803") },
+        { _id: new mongodb.ObjectId(this._id) },
         { $set: { cart: updatedCart } }
       );
   }
@@ -57,7 +69,7 @@ class User {
     return db
       .collection("users")
       .updateOne(
-        { _id: new mongodb.ObjectId("5eb08c6f94c440a2b5007803") },
+        { _id: new mongodb.ObjectId(this._id) },
         { $set: { cart: { items: updatedItems } } }
       )
       .then()
@@ -98,7 +110,7 @@ class User {
             return db
               .collection("users")
               .updateOne(
-                { _id: new mongodb.ObjectId("5eb08c6f94c440a2b5007803") },
+                { _id: new mongodb.ObjectId(this._id) },
                 { $set: { cart: this.cart } }
               );
           })
@@ -114,6 +126,20 @@ class User {
     return db
       .collection("users")
       .find({ _id: usersId })
+      .next()
+      .then((result) => {
+        return result;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  static find(obj) {
+    const db = getDb();
+    return db
+      .collection("users")
+      .find(obj)
       .next()
       .then((result) => {
         return result;

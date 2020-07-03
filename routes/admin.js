@@ -1,5 +1,5 @@
 const express = require("express");
-const path = require("path");
+const { body } = require("express-validator");
 
 const adminController = require("../controller/admin");
 const routeProtection = require("../protectionMiddleW/routeProtection");
@@ -8,7 +8,21 @@ const router = express.Router();
 
 router.get("/add-product", routeProtection, adminController.getAddProduct);
 
-router.post("/add-product", routeProtection, adminController.postAddProduct);
+router.post(
+  "/add-product",
+  routeProtection,
+  [
+    body("title", "title must contain letter and numbers only.")
+      .isString()
+      .trim(),
+    body("price", "price must be float").isFloat().trim(),
+    body("imgUrl", "imgUrl must be valid img url").isURL().trim(),
+    body("description", "description length must bound in 5-400 chracter")
+      .isLength({ min: 5, max: 400 })
+      .trim(),
+  ],
+  adminController.postAddProduct
+);
 
 router.get("/edit-product", routeProtection, adminController.getEditProduct);
 

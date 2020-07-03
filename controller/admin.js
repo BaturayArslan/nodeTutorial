@@ -1,12 +1,14 @@
+const { validationResult } = require("express-validator");
+
 const Product = require("../model/Product");
 // const User = require("../model/User");
 
 exports.getAddProduct = (req, res, next) => {
-  const isLogged = req.session.isLogged;
   res.render("admin/edit-product", {
     title: "Admin Panel",
     path: "/admin/add-product",
-    isAuthenticated: isLogged,
+    editMode: "false",
+    errorMode: "false",
   });
 };
 
@@ -15,6 +17,24 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const imgUrl = req.body.imgUrl;
   const description = req.body.description;
+
+  const errors = validationResult(req);
+  console.log(errors.array());
+  if (!errors.isEmpty()) {
+    return res.status(422).render("admin/edit-product", {
+      title: "Admin Panel",
+      path: "/admin/add-product",
+      errors: errors.array(),
+      editMode: "false",
+      errorMode: "true",
+      product: {
+        title: title,
+        price: price,
+        imgUrl: imgUrl,
+        description: description,
+      },
+    });
+  }
   const product = new Product(title, price, description, imgUrl, null);
   product
     .save()
@@ -23,7 +43,9 @@ exports.postAddProduct = (req, res, next) => {
       res.redirect("/");
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 
   // const body = { ...req.body };
@@ -59,7 +81,9 @@ exports.getEditProduct = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -76,7 +100,9 @@ exports.postEditProduct = (req, res, next) => {
       res.redirect("/admin/product-list");
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -92,7 +118,9 @@ exports.getProductList = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -103,6 +131,8 @@ exports.deleteProduct = (req, res, next) => {
       res.redirect("/admin/product-list");
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };

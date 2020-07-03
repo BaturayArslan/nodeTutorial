@@ -5,17 +5,36 @@ block styles
   link(rel="stylesheet", href="/css/product.css")
 block content
   main
-    form.product-form(action=(editMode==="true" ? "/admin/edit-product":"/admin/add-product"), method="POST")
+    if(errors[0])
+      div.message.eror-message #{errors[0].msg}
+    form.product-form(action=(editMode==="true" ? "/admin/edit-product":"/admin/add-product"), method="POST" novalidate)
       .form-control
         label(for="title") Title
-        input(type="text", name="title", id="title" value=(editMode==="true" ? product.title:""))
+        input(
+          type="text", 
+          name="title", 
+          id="title",
+          class= (errors.find(e => e.param ==="title") ? "invalid": "")
+          value=(editMode==="true" || errorMode==="true" ? product.title:""))
         label(for="price") Price
-        input(type="text", name="price", id="price" value = (editMode==="true" ? product.price:""))
+        input(type="text", 
+          name="price", 
+          id="price",
+          class= (errors.find(e => e.param ==="price") ? "invalid": "")
+          value=(editMode==="true" || errorMode==="true" ? product.price:""))
         label(for="imgUrl") imgUrl
-        input(type="text" name="imgUrl" max="20000" value = (editMode==="true" ? product.imgUrl:""))
-        input(type="hidden", name="productId", value=(editMode==="true" ? product._id:""))
+        input(type="text"
+          name="imgUrl"
+          max="20000" ,
+          class= (errors.find(e => e.param ==="imgUrl") ? "invalid": "")
+          value=(editMode==="true" || errorMode==="true" ? product.imgUrl:""))
         label(for="description") Description
-        textarea(rows="5"  cols="50", name="description")  #{editMode === "true" ? product.description:""}
+        textarea(
+          rows="5"
+          cols="50",
+          class= (errors.find(e => e.param ==="descripton") ? "invalid": "")
+          name="description")  #{editMode === "true" || errorMode === "true" ? product.description:""}
+        input(type="hidden", name="productId", value=(editMode==="true" ? product._id:""))
         input(type="hidden", name="_csrf", value = csrfToken)
       button(type="submit") #{editMode==="true" ? "Edit Product":"Add Product"}
     
