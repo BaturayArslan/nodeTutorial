@@ -119,6 +119,36 @@ class User {
           });
       });
   }
+  // ------------------ ORDERS LOGİC -----------------
+  getOrder() {
+    const db = getDb();
+    const userId = new mongodb.ObjectId(this._id);
+    return db
+      .collection("orders")
+      .find({ "user._id": userId })
+      .toArray()
+      .then((result) => {
+        return result;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  static findOrder(id) {
+    const orderId = mongodb.ObjectID(id);
+    const db = getDb();
+    return db
+      .collection("orders")
+      .findOne({ _id: orderId })
+      .then((result) => {
+        return result;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  // ---------- END OF ORDERS LOGİC
 
   static findById(id) {
     const usersId = mongodb.ObjectId(id);

@@ -11,7 +11,7 @@ block content
               h1.product__title #{product.title}
             div.card__image
               img(
-                src= product.imgUrl,
+                src= "/" + product.imgUrl,
                 alt="A Book"
               )
             .card__content
@@ -25,3 +25,17 @@ block content
               a.btn(href="product-details/" + product._id) Details
     else
       h1 there is no product
+    section
+      div.pagination
+        if (prevPage !== 1 && currentPage !== 1)
+          a(href="/?page=1") 1
+        if(hasPrevPage)
+          a(href="/?page=" + prevPage) #{prevPage}
+
+        a.active(href="/?page=" + currentPage) #{currentPage}
+        
+        if(hasNextPage)
+          a(href="/?page=" + nextPage) #{nextPage}
+        
+        if(nextPage !== totalPage && currentPage !== totalPage)
+          a(href="/?page=" + totalPage) ...#{totalPage}

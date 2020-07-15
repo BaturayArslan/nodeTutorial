@@ -11,7 +11,7 @@ block content
               h1.product__title #{product.title}
             div.card__image
               img(
-                src= product.imgUrl,
+                src= "/" + product.imgUrl,
                 alt="A Book"
               )
             .card__content
@@ -19,6 +19,9 @@ block content
               p.product__description #{product.description}
             div.card__actions
               a.btn(href="/admin/edit-product/" + product._id + "?edit=true") Edit
-              a.btn(href="/admin/delete-product/" + product._id) Delete
+              input(type="hidden", name="productId" , value = product._id)
+              input(type="hidden", name="_csrf" , value = csrfToken)
+              button.btn(type="button", onclick="deleteProduct(this)" ) Delete
     else
       h1 there is no product
+    script(src="/js/admin.js")

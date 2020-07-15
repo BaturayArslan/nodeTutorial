@@ -6,6 +6,7 @@ const session = require("express-session");
 const MongoDbStore = require("connect-mongodb-session")(session);
 const csurf = require("csurf");
 const flash = require("connect-flash");
+const multer = require("multer");
 
 const adminData = require("./routes/admin");
 const shopRoute = require("./routes/shop");
@@ -23,11 +24,41 @@ const store = new MongoDbStore({ uri: MONGOURI, collection: "sessions" });
 // ----- csurf setup
 const csrfProtection = csurf();
 
+//----- storage handler setup for multer
+
+const storageHandler = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "images");
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      new Date().toISOString().replace(/:/g, "-") + "-" + file.originalname
+    );
+  },
+});
+
+const filterHandler = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 app.set("views", "views");
 app.set("view engine", "pug");
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  multer({ storage: storageHandler, fileFilter: filterHandler }).single("img")
+);
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(
   session({
     secret: "this is key",
@@ -69,7 +100,7 @@ app.use(authRoute);
 app.use("/500", erorController.eror500);
 app.use(erorController.eror404);
 app.use((error, req, res, next) => {
-  res.redirect("/500");
+  console.log(error);
 });
 
 mongoConnect(() => {

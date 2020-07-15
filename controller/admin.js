@@ -4,20 +4,40 @@ const Product = require("../model/Product");
 // const User = require("../model/User");
 
 exports.getAddProduct = (req, res, next) => {
+  const errors = validationResult(req);
   res.render("admin/edit-product", {
     title: "Admin Panel",
     path: "/admin/add-product",
     editMode: "false",
     errorMode: "false",
+    errors: errors.array(),
   });
 };
 
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
   const price = req.body.price;
-  const imgUrl = req.body.imgUrl;
+  const imgUrl = req.file;
   const description = req.body.description;
+  console.log(imgUrl);
 
+  // ---- if imgUrl is not set then send a eror
+  if (!imgUrl) {
+    return res.status(422).render("admin/edit-product", {
+      title: "Admin Panel",
+      path: "/admin/add-product",
+      errors: [{ msg: "image cant be read" }],
+      editMode: "false",
+      errorMode: "true",
+      product: {
+        title: title,
+        price: price,
+        imgUrl: null,
+        description: description,
+      },
+    });
+  }
+  // --- if there is a validation eror then send a eror
   const errors = validationResult(req);
   console.log(errors.array());
   if (!errors.isEmpty()) {
@@ -35,7 +55,9 @@ exports.postAddProduct = (req, res, next) => {
       },
     });
   }
-  const product = new Product(title, price, description, imgUrl, null);
+
+  // ---- if there is a no eror then save the product
+  const product = new Product(title, price, description, imgUrl.path, null);
   product
     .save()
     .then((result) => {
@@ -70,6 +92,7 @@ exports.getEditProduct = (req, res, next) => {
   const isLogged = req.session.isLogged;
   let proId = req.params.productId;
   let editMode = req.query.edit;
+  const errors = validationResult(req);
   Product.findById(proId)
     .then((product) => {
       res.render("admin/edit-product", {
@@ -78,6 +101,7 @@ exports.getEditProduct = (req, res, next) => {
         product: product,
         editMode: editMode,
         isAuthenticated: isLogged,
+        errors: errors.array(),
       });
     })
     .catch((err) => {
@@ -91,9 +115,15 @@ exports.postEditProduct = (req, res, next) => {
   const title = req.body.title;
   const price = req.body.price;
   const description = req.body.description;
-  const imgUrl = req.body.imgUrl;
+  const imgUrl = req.file;
   const id = req.body.productId;
-  const product = new Product(title, price, description, imgUrl, id);
+
+  let product;
+  if (!imgUrl) {
+    product = new Product(title, price, description, null, id);
+  } else {
+    product = new Product(title, price, description, imgUrl.path, id);
+  }
   product
     .save()
     .then(() => {
@@ -109,6 +139,7 @@ exports.postEditProduct = (req, res, next) => {
 exports.getProductList = (req, res, next) => {
   const isLogged = req.session.isLogged;
   Product.fetchAll()
+    .toArray()
     .then((products) => {
       res.render("admin/product-list", {
         path: "/admin/product-list",
@@ -128,11 +159,9 @@ exports.deleteProduct = (req, res, next) => {
   let proId = req.params.productId;
   Product.delete(proId)
     .then(() => {
-      res.redirect("/admin/product-list");
+      res.status(200).json({ message: "Deleting process success." });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
+      res.status(500).json({ message: "Deleting process failed." });
     });
 };

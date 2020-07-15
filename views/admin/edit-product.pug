@@ -7,7 +7,7 @@ block content
   main
     if(errors[0])
       div.message.eror-message #{errors[0].msg}
-    form.product-form(action=(editMode==="true" ? "/admin/edit-product":"/admin/add-product"), method="POST" novalidate)
+    form.product-form(action=(editMode==="true" ? "/admin/edit-product":"/admin/add-product"), method="POST", enctype="multipart/form-data", novalidate)
       .form-control
         label(for="title") Title
         input(
@@ -22,12 +22,10 @@ block content
           id="price",
           class= (errors.find(e => e.param ==="price") ? "invalid": "")
           value=(editMode==="true" || errorMode==="true" ? product.price:""))
-        label(for="imgUrl") imgUrl
-        input(type="text"
-          name="imgUrl"
-          max="20000" ,
-          class= (errors.find(e => e.param ==="imgUrl") ? "invalid": "")
-          value=(editMode==="true" || errorMode==="true" ? product.imgUrl:""))
+        label(for="img") img
+        input(type="file",
+          name="img",
+          id="img")
         label(for="description") Description
         textarea(
           rows="5"

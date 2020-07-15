@@ -188,6 +188,7 @@ exports.postReset = (req, res, next) => {
       return res.redirect("/reset");
     }
     const resetToken = buffer.toString("hex");
+    console.log(resetToken);
     User.findByEmail(email)
       .then((userDoc) => {
         if (!userDoc) {
@@ -204,16 +205,18 @@ exports.postReset = (req, res, next) => {
         return User.save(user);
       })
       .then(() => {
+        return transporter.sendMail({
+          to: "baturay_arslan_fb@hotmail.com",
+          from: "baturay.arslan.fb1@gmail.com",
+          subject: "reset Password",
+          html: `
+           <p> to reset password </P>
+           <p> click this: <a href="http://localhost:5000/reset/${resetToken}">RESET</a></p>
+           `,
+        });
+      })
+      .then(() => {
         res.redirect("/");
-        // return transporter.sendMail({
-        //   to: "baturay_arslan_fb@hotmail.com",
-        //   from: "baturay.arslan.fb1@gmail.com",
-        //   subject: "reset Password",
-        //   html: `
-        //    <p> to reset password </P>
-        //    <p> click this: <a href="http://localhost:5000/reset/${resetToken}">RESET</a></p>
-        //    `,
-        // });
       })
       .catch((err) => {
         const error = new Error(err);

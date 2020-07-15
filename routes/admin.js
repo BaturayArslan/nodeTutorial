@@ -16,7 +16,6 @@ router.post(
       .isString()
       .trim(),
     body("price", "price must be float").isFloat().trim(),
-    body("imgUrl", "imgUrl must be valid img url").isURL().trim(),
     body("description", "description length must bound in 5-400 chracter")
       .isLength({ min: 5, max: 400 })
       .trim(),
@@ -36,7 +35,7 @@ router.get(
 
 router.get("/product-list", routeProtection, adminController.getProductList);
 
-router.get(
+router.delete(
   "/delete-product/:productId",
   routeProtection,
   adminController.deleteProduct
